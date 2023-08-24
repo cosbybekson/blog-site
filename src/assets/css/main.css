@@ -31,8 +31,21 @@ a {
 .btn {
   padding: 15px 55px;
   border-radius: 3px;
+  color: white;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border: none;
 }
 
 .btn-primary {
   background: var(--button-light, rgba(255, 255, 255, 0.1)) !important;
+  box-shadow: 0px 15px 30px 0px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:active {
+  background-color: rgba(37, 37, 36, 0.1) !important;
+  border-color: rgba(37, 37, 36, 0.1) !important;
 }
