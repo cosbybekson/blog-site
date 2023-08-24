@@ -1,0 +1,38 @@
+body {
+  font-family: "Manrope", sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  font-family: "Manrope", sans-serif;
+}
+
+a {
+  font-family: "Manrope", sans-serif;
+  color: #fff;
+  font-size: 14px;
+  font-style: normal;
+  font-weight: 500;
+  line-height: normal;
+}
+
+.color-green {
+  color: var(--green, #16fcd2) !important;
+}
+
+.color-muted {
+  color: var(--muted, rgba(255, 255, 255, 0.6)) !important;
+}
+
+.btn {
+  padding: 15px 55px;
+  border-radius: 3px;
+}
+
+.btn-primary {
+  background: var(--button-light, rgba(255, 255, 255, 0.1)) !important;
+}
