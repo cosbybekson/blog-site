@@ -20,6 +20,14 @@ a {
   line-height: normal;
 }
 
+a:hover{
+  color: var(--muted, rgba(255, 255, 255, 0.6)) !important;
+}
+
+.px-100 {
+  padding: 0 410px !important;
+}
+
 .color-green {
   color: var(--green, #16fcd2) !important;
 }
@@ -28,11 +36,60 @@ a {
   color: var(--muted, rgba(255, 255, 255, 0.6)) !important;
 }
 
-.btn {
+/* .btn {
   padding: 15px 55px;
   border-radius: 3px;
+  color: white;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  gap: 10px;
+  border: none;
+} */
+
+.form-btn {
+  width: 300px;
+  height: 50px;
+  margin-bottom: 30px;
+  margin-right: auto;
+  margin-left: auto;
+  background: #090d1f;
+  border-radius: 10px;
+  border: none;
+  text-align: center;
 }
 
 .btn-primary {
   background: var(--button-light, rgba(255, 255, 255, 0.1)) !important;
+  box-shadow: 0px 15px 30px 0px rgba(0, 0, 0, 0.1) !important;
+}
+
+.btn-primary:hover,
+.btn-primary:active {
+  background-color: rgba(37, 37, 36, 0.1) !important;
+  border-color: rgba(37, 37, 36, 0.1) !important;
+}
+
+.blog-content-pd {
+  padding: 180px 0;
+}
+
+/* Phone Styles */
+@media (max-width: 767px) {
+  .px-100 {
+    padding: 0 20px !important;
+  }
+  .blog-content-pd {
+    padding: 60px 0;
+  }
+}
+
+/* Tablet Styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+  .px-100 {
+    padding: 0 200px !important;
+  }
+  .blog-content-pd {
+    padding: 90px 0;
+  }
 }
