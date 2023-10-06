@@ -1,6 +1,6 @@
 import axios from "axios";
 import constants from "@/utils/constants";
-import { getToken } from "./storage";
+import sessionManager from "@/utils/session_manager";
 
 export default async function makeRequest(
   endpoint = "",
@@ -8,7 +8,7 @@ export default async function makeRequest(
   headers = {}
 ) {
   const url = `${constants.BASE_URL}${endpoint}`;
-  const AUTH_TOKEN = getToken();
+  const AUTH_TOKEN = sessionManager.getToken();
 
   const config = {
     ...options,

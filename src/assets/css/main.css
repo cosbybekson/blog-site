@@ -20,6 +20,10 @@ a {
   line-height: normal;
 }
 
+a:hover{
+  color: var(--muted, rgba(255, 255, 255, 0.6)) !important;
+}
+
 .px-100 {
   padding: 0 410px !important;
 }

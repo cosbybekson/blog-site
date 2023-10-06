@@ -1,7 +1,7 @@
 <template>
   <nav class="sb-topnav navbar navbar-expand navbar-dark bg-dark">
     <!-- Navbar Brand-->
-    <router-link to="/admin/dashboard">
+    <router-link to="/dashboard">
       <a href="#" class="navbar-brand ps-3 text-decoration-none">Blog Site</a>
     </router-link>
     <!-- Sidebar Toggle-->
@@ -45,11 +45,13 @@
           class="dropdown-menu dropdown-menu-end"
           aria-labelledby="navbarDropdown"
         >
-          <router-link to="/admin/settings">
+          <router-link to="/dashboard/settings">
             <li><a class="dropdown-item" href="#!">Settings</a></li>
           </router-link>
           <li><hr class="dropdown-divider" /></li>
-          <li><a class="dropdown-item" href="#!">Logout</a></li>
+          <li>
+            <a class="dropdown-item" @click="logout" href="#!">Logout</a>
+          </li>
         </ul>
       </li>
     </ul>
@@ -57,8 +59,32 @@
 </template>
 
 <script>
+import userStorage from "@/utils/user_storage";
+import sessionManager from "@/utils/session_manager";
+
 export default {
+  methods: {
+    logout() {
+      this.$swal({
+        title: "Logout",
+        text: "Are you sure you want to logout?",
+        icon: "warning",
+        confirmButtonText: "Yes, Logout!",
+        showCancelButton: true,
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#090d1f",
+        cancelButtonColor: "#d33",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          userStorage.clearUser();
+          sessionManager.clearToken();
+          this.$router.push("/login");
+        }
+      });
+    },
+  },
   mounted() {
+    // TODO: Use vue-store ... State management
     // Toggle the side navigation
     const sidebarToggle = document.body.querySelector("#sidebarToggle");
     if (sidebarToggle) {

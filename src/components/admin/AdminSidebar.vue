@@ -3,8 +3,8 @@
     <nav class="sb-sidenav accordion sb-sidenav-dark" id="sidenavAccordion">
       <div class="sb-sidenav-menu">
         <div class="nav">
-          <router-link to="/admin/dashboard">
-            <a class="nav-link" href="index.html">
+          <router-link to="/dashboard">
+            <a class="nav-link">
               <div class="sb-nav-link-icon">
                 <i class="fas fa-tachometer-alt"></i>
               </div>
@@ -36,16 +36,16 @@
             data-bs-parent="#sidenavAccordion"
           >
             <nav class="sb-sidenav-menu-nested nav">
-              <router-link to="/admin/new-post">
-                <a class="nav-link" href="layout-static.html"> Write </a>
+              <router-link to="/dashboard/new-post">
+                <a class="nav-link"> Write </a>
               </router-link>
-              <router-link to="/admin/post">
-                <a class="nav-link" href="layout-sidenav-light.html"> Posts </a>
+              <router-link to="/dashboard/post">
+                <a class="nav-link"> Posts </a>
               </router-link>
             </nav>
           </div>
-          <router-link to="/admin/category">
-            <a class="nav-link" href="charts.html">
+          <router-link to="/dashboard/category">
+            <a class="nav-link">
               <div class="sb-nav-link-icon">
                 <i class="fa-solid fa-hashtag"></i>
               </div>
@@ -54,36 +54,62 @@
           </router-link>
 
           <div class="sb-sidenav-menu-heading">Account</div>
-          <router-link to="/admin/settings">
-            <a class="nav-link" href="charts.html">
+          <router-link to="/dashboard/settings">
+            <a class="nav-link">
               <div class="sb-nav-link-icon">
                 <i class="fa-solid fa-gear"></i>
               </div>
               Account Settings
             </a>
           </router-link>
-          <a class="nav-link" href="tables.html">
-            <div class="sb-nav-link-icon">
-              <i class="fas fa-right-from-bracket"></i>
-            </div>
-            Logout
-          </a>
+          <router-link to="#">
+            <a class="nav-link" @click="logout">
+              <div class="sb-nav-link-icon">
+                <i class="fas fa-right-from-bracket"></i>
+              </div>
+              Logout
+            </a>
+          </router-link>
         </div>
       </div>
       <div class="sb-sidenav-footer">
         <div class="small">Logged in as:</div>
-        Anumaaba
+        {{ username }}
       </div>
     </nav>
   </div>
 </template>
 
 <script>
-// import AdminPost from "@/views/admin/AdminPost.vue";
-// import AdminSettings from "@/views/admin/AdminSettings.vue";
-// import AdminNewPost from "@/views/admin/AdminNewPost.vue";
+import userStorage from "@/utils/user_storage";
+import sessionManager from "@/utils/session_manager";
+
 export default {
-  // components: { AdminPost, AdminSettings, AdminNewPost },
+  data() {
+    return {
+      username: userStorage.getUser(),
+    };
+  },
+  methods: {
+    logout() {
+      this.$swal({
+        title: "Logout",
+        text: "Are you sure you want to logout?",
+        icon: "warning",
+        confirmButtonText: "Yes, Logout!",
+        showCancelButton: true,
+        cancelButtonText: "Cancel",
+        confirmButtonColor: "#090d1f",
+        cancelButtonColor: "#d33",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          userStorage.clearUser();
+          sessionManager.clearToken();
+          this.$router.push("/login");
+        }
+      });
+    },
+  },
 };
 </script>
 

@@ -1,34 +1,56 @@
 <template>
   <nav-header />
+  <div class="container my-0">
+    <error-card v-if="error" :error="error"></error-card>
 
-  <div class="container my-5">
     <base-card>
-      <div v-if="error" class="alert alert-danger mb-4" role="alert">
+      <!-- <div v-if="error" class="alert alert-danger mb-4" role="alert">
         {{ error }}
-      </div>
-      <h1 class="my-5 text-center text-white">Login</h1>
+      </div> -->
+      <h1 class="my-5 text-center text-white text-uppercase fw-bolder">
+        Login
+      </h1>
       <div class="login">
-        <form @submit.prevent="login">
-          <input
-            type="username"
-            v-model.trim="username"
-            required
-            placeholder="Enter Username"
-          />
-          <input
-            type="password"
-            v-model.trim="password"
-            placeholder="Enter Password"
-            required
-          />
-          <div class="d-grid gap-2 mb-3 form-btn">
-            <button type="submit" class="btn text-white">Login</button>
+        <Form @submit="login">
+          <div>
+            <Field
+              v-model.trim="username"
+              id="username"
+              name="username"
+              placeholder="Enter Username"
+              :rules="validateUsername"
+            />
+            <ErrorMessage
+              name="username"
+              class="text-center justify-content-center d-flex text-danger"
+            />
           </div>
-        </form>
+
+          <div class="mt-4">
+            <Field
+              v-model.trim="password"
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter Password"
+              :rules="validatePassword"
+            />
+            <ErrorMessage
+              name="password"
+              class="text-center justify-content-center d-flex text-danger"
+            />
+          </div>
+          <div class="d-grid gap-2 mt-4 form-btn">
+            <button type="submit" :disabled="loading" class="btn text-white">
+              <span v-if="!loading">Login</span>
+              <circular-progress v-if="loading" />
+            </button>
+          </div>
+        </Form>
       </div>
-      <p class="mt-3 sign-up text-center text-white">
+      <p class="mt-3 sign-up text-center text-white mb-5">
         Don't have an account?
-        <router-link to="/sign-up" class="text-primary">Sign Up</router-link>
+        <router-link to="/sign-up">Sign Up</router-link>
       </p>
     </base-card>
   </div>
@@ -38,24 +60,40 @@
 <script>
 import NavHeader from "@/components/NavHeader.vue";
 import BaseCard from "@/components/cards/BaseCard.vue";
-// import LogButton from "@/components/buttons/LogButton.vue";
 import FooterPage from "@/components/FooterPage.vue";
+import ErrorCard from "@/components/ErrorCard.vue";
+import CircularProgress from "@/components/buttons/CircularProgress.vue";
+
 import makeRequest from "@/utils/requester";
 import constants from "@/utils/constants";
-// import storage from "@/utils/storage";
+import sessionManager from "@/utils/session_manager";
+import Validator from "@/utils/validator";
+
+import { Form, Field, ErrorMessage } from "vee-validate";
 
 export default {
-  components: { BaseCard, NavHeader, FooterPage },
+  components: {
+    BaseCard,
+    FooterPage,
+    NavHeader,
+    Form,
+    Field,
+    ErrorMessage,
+    ErrorCard,
+    CircularProgress,
+  },
   data() {
     return {
       username: "",
       password: "",
       error: null,
+      loading: false,
     };
   },
   methods: {
     async login() {
       try {
+        this.startLoading();
         const result = await makeRequest(constants.LOGIN_URL, {
           method: "post",
           data: {
@@ -65,30 +103,47 @@ export default {
         });
 
         console.log(result);
+        this.stopLoading();
 
-        if (result.status == true) {
+        if (result.success) {
           console.log(result);
-          // storage.saveToken(JSON.stringify(result.data[0]))
+          const dataResponse = result.data;
+          sessionManager.saveToken(dataResponse.accessToken);
           // this.$router.push({ name: "/" });
         } else {
-          this.error = result.message
+          this.error = result.message;
         }
       } catch (error) {
-        this.error = "Something went wrong!"
+        this.error = "Something went wrong!";
         console.error(error);
       }
+    },
+    validateUsername() {
+      return Validator.validateAlphaNumeric(this.username);
+    },
+
+    validatePassword() {
+      return Validator.validatePassword(this.password);
+    },
+
+    startLoading() {
+      this.error = null;
+      this.loading = true;
+    },
+
+    stopLoading() {
+      this.loading = false;
     },
   },
 };
 </script>
-
 <style scoped>
 .login input {
   width: 300px;
   height: 40px;
   padding-left: 20px;
   display: block;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   margin-right: auto;
   margin-left: auto;
   border: 1px solid skyblue;
@@ -96,9 +151,8 @@ export default {
 
 button {
   width: 300px;
-  height: 40px;
   padding: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   margin-right: auto;
   margin-left: auto;
   background: rgba(255, 255, 255, 0.1);
@@ -112,8 +166,9 @@ button:hover {
   background: rgba(0, 0, 0, 0.1);
 }
 
-.sign-up {
+.sign-up a {
   font-weight: 600;
-  font-size: 18px;
+  font-size: 16px;
+  text-decoration: underline;
 }
 </style>

@@ -1,94 +1,135 @@
 <template>
-      <nav-header/>
-
+  <nav-header />
   <div class="container my-0">
-    <base-dialog
-      v-if="error !== ''"
-      class="alert alert-danger my-4"
-      role="alert"
-    >
-      {{ error }}
-      <base-spinner></base-spinner>
-    </base-dialog>
+    <error-card v-if="error" :error="error"></error-card>
+
     <base-card>
-      <h1 class="my-5 text-center text-white">Signup</h1>
+      <h1 class="my-5 text-center text-white text-uppercase fw-bolder">Signup</h1>
       <div class="signup">
-        <form>
-          <input type="text" v-model="name" required placeholder="Enter Name" />
-          <input
-            type="email"
-            v-model="email"
-            required
-            placeholder="Enter Email"
-          />
-          <input
-            type="password"
-            v-model="password"
-            placeholder="Enter Password"
-            required
-          />
-        </form>
+        <Form @submit="signup">
+          <div>
+            <Field
+              v-model.trim="username"
+              id="username"
+              name="username"
+              placeholder="Enter Username"
+              :rules="validateUsername"
+            />
+            <ErrorMessage
+              name="username"
+              class="text-center justify-content-center d-flex text-danger"
+            />
+          </div>
+
+          <div class="mt-4">
+            <Field
+              v-model.trim="password"
+              type="password"
+              id="password"
+              name="password"
+              placeholder="Enter Password"
+              :rules="validatePassword"
+            />
+            <ErrorMessage
+              name="password"
+              class="text-center justify-content-center d-flex text-danger"
+            />
+          </div>
+
+          <div class="d-grid gap-2 mt-4 form-btn">
+            <button type="submit" :disabled="loading" class="btn text-white">
+              <span v-if="!loading">Signup</span>
+              <circular-progress v-if="loading" />
+            </button>
+          </div>
+        </Form>
       </div>
-      <log-button to="/">Login</log-button>
-      <p class="mt-3 sign-up text-center text-white">
+      <p class="mt-3 sign-up text-center text-white mb-5">
         Already have an account?
-        <router-link to="/login" class="text-primary">Login</router-link>
+        <router-link to="/login">Login</router-link>
       </p>
     </base-card>
-    <footer-page/>
-
   </div>
-
+  <footer-page />
 </template>
 
 <script>
 import NavHeader from "@/components/NavHeader.vue";
+import ErrorCard from "@/components/ErrorCard.vue";
 import BaseCard from "@/components/cards/BaseCard.vue";
-import LogButton from "@/components/buttons/LogButton.vue";
 import FooterPage from "@/components/FooterPage.vue";
-import { isEmpty } from "@/utils/function.js";
-import axios from "axios";
+import CircularProgress from "@/components/buttons/CircularProgress.vue";
+
+import makeRequest from "@/utils/requester";
+import constants from "@/utils/constants";
+import sessionManager from "@/utils/session_manager";
+import Validator from "@/utils/validator";
+
+import { Form, Field, ErrorMessage } from "vee-validate";
 
 export default {
-  components: { BaseCard, LogButton, NavHeader, FooterPage },
+  components: {
+    BaseCard,
+    NavHeader,
+    FooterPage,
+    Form,
+    Field,
+    ErrorMessage,
+    ErrorCard,
+    CircularProgress,
+  },
+
   data() {
     return {
-      name: "",
-      email: "",
+      username: "",
       password: "",
-      error: "",
+      error: null,
+      loading: false,
     };
   },
-  methods: {
-    async signUp(e) {
-      if (isEmpty(this.name) || isEmpty(this.password) || isEmpty(this.email)) {
-        this.error = "Error";
-        e.preventDefault();
-        return;
-      }
 
+  methods: {
+    async signup() {
       try {
-        let response = await axios.post("http://localhost:3000/post", {
-          email: this.email,
-          password: this.password,
-          name: this.name,
+        this.startLoading();
+        const result = await makeRequest(constants.SIGNUP_URL, {
+          method: "post",
+          data: {
+            username: this.username,
+            password: this.password,
+          },
         });
 
-        if (response.status === 201) {
-          let data = response.data; 
-          localStorage.setItem("user-info", JSON.stringify(data));
-          this.$router.push({ name: "home" });
+        this.stopLoading();
+        if (result.success) {
+          const dataResponse = result.data;
+          sessionManager.saveToken(dataResponse.accessToken);
+          // this.$router.push({ name: "/" });
+        } else {
+          this.error = result.message;
         }
       } catch (error) {
-        console.error("Error signing up:", error);
+        console.log(error);
+        this.error = "Something went wrong";
       }
     },
-  },
-  mounted() {
-    let user = localStorage.getItem("user-info");
-    if (user) {
-      this.$router.push({ name: "home" });
-    }
+
+    validateUsername() {
+      return Validator.validateAlphaNumeric(this.username);
+    },
+
+    validatePassword() {
+      return Validator.validatePassword(this.password);
+    },
+
+    startLoading() {
+      this.error = null;
+      this.loading = true;
+    },
+
+    stopLoading() {
+      this.loading = false;
+    },
   },
 };
 </script>
@@ -99,7 +140,7 @@ export default {
   height: 40px;
   padding-left: 20px;
   display: block;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   margin-right: auto;
   margin-left: auto;
   border: 1px solid skyblue;
@@ -107,9 +148,8 @@ export default {
 
 button {
   width: 300px;
-  height: 40px;
   padding: 10px;
-  margin-bottom: 30px;
+  margin-bottom: 10px;
   margin-right: auto;
   margin-left: auto;
   background: rgba(255, 255, 255, 0.1);
@@ -123,8 +163,10 @@ button:hover {
   background: rgba(0, 0, 0, 0.1);
 }
 
-.sign-up {
+.sign-up a {
   font-weight: 600;
-  font-size: 18px;
+  font-size: 16px;
+  text-decoration: underline;
 }
+
 </style>

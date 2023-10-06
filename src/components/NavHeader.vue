@@ -1,17 +1,17 @@
 <template>
   <div>
-    <nav class="navbar navbar-expand-lg py-5">
+    <nav class="navbar navbar-expand-lg py-3">
       <div class="container">
         <div class="navbar-brand d-flex">
-          <h3 class="text-white"><a href="#" to="/">BlogPost</a></h3>
+          <h3 class="text-white"><router-link to="/">BlogPost</router-link></h3>
         </div>
-        <div class="d-flex">
+        <!-- <div class="d-flex">
           <router-link to="/login">
             <app-button
               type="button"
               class="btn btn-primary"
-              @click="login"
-              v-if="!loggedIn"
+              @click="toggleAuth"
+              v-if="loggedIn"
             >
               Login
             </app-button>
@@ -21,8 +21,42 @@
             <app-button
               type="button"
               class="btn btn-primary"
-              @click="signUp"
-              v-if="loggedIn"
+              @click="toggleAuth"
+              v-if="!loggedIn"
+            >
+              Sign Up
+            </app-button>
+          </router-link>
+        </div> -->
+
+        <!-- <div class="d-flex">
+          <router-link to="/login">
+            <app-button
+              type="button"
+              class="btn btn-primary"
+              @click="toggleAuth"
+            >
+              {{ loggedIn ? "Sign Up" : "Login" }}
+            </app-button>
+          </router-link>
+        </div> -->
+
+        <div class="d-flex">
+          <router-link v-if="!loggedIn" to="/login">
+            <app-button
+              type="button"
+              class="btn btn-primary"
+              @click="toggleAuth"
+            >
+              Login
+            </app-button>
+          </router-link>
+
+          <router-link v-if="loggedIn" to="/sign-up">
+            <app-button
+              type="button"
+              class="btn btn-primary"
+              @click="toggleAuth"
             >
               Sign Up
             </app-button>
@@ -35,17 +69,23 @@
 
 <script>
 export default {
-  data() {
-    return {
-      loggedIn: false,
-    };
+  computed: {
+    loggedIn() {
+      if (this.$route.path.includes("login")) {
+        return true;
+      }
+      return false;
+    },
   },
   methods: {
-    login() {
-      this.loggedIn = true;
-    },
-    signUp() {
-      this.loggedIn = false;
+    toggleAuth() {
+      if (!this.loggedIn) {
+        // Redirect to Login page
+        this.$router.push("/login");
+      } else {
+        // Redirect to Sign Up page
+        this.$router.push("/sign-up");
+      }
     },
   },
 };
