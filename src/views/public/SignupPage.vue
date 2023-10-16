@@ -4,7 +4,9 @@
     <error-card v-if="error" :error="error"></error-card>
 
     <base-card>
-      <h1 class="my-5 text-center text-white text-uppercase fw-bolder">Signup</h1>
+      <h1 class="my-5 text-center text-white text-uppercase fw-bolder">
+        Signup
+      </h1>
       <div class="signup">
         <Form @submit="signup">
           <div>
@@ -64,6 +66,7 @@ import makeRequest from "@/utils/requester";
 import constants from "@/utils/constants";
 import sessionManager from "@/utils/session_manager";
 import Validator from "@/utils/validator";
+import userStorage from "@/utils/user_storage";
 
 import { Form, Field, ErrorMessage } from "vee-validate";
 
@@ -104,7 +107,8 @@ export default {
         if (result.success) {
           const dataResponse = result.data;
           sessionManager.saveToken(dataResponse.accessToken);
-          // this.$router.push({ name: "/" });
+          userStorage.saveUser(dataResponse.user);
+          this.$router.push("/dashboard");
         } else {
           this.error = result.message;
         }
@@ -168,5 +172,4 @@ button:hover {
   font-size: 16px;
   text-decoration: underline;
 }
-
 </style>

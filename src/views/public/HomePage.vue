@@ -1,16 +1,16 @@
 <template>
   <div>
-    <nav-header/>
+    <nav-header />
     <page-header badge="Blog" title="Get precise knowledge wherever you are" />
     <div class="container">
       <hr />
       <div class="row blog-content-pd">
         <div
           v-for="post in posts"
-          :key="post.id"
+          :key="post._id"
           class="col-lg-4 col-md-6 col-sm-12"
         >
-          <router-link :to="`/blogs/${post.id}`" class="router-link">
+          <router-link :to="`/blogs/${post._id}`" class="router-link">
             <blog-item
               :imageSrc="post.imgUrl"
               :title="post.title"
@@ -33,27 +33,40 @@ import NavHeader from "@/components/NavHeader.vue";
 import PageHeader from "@/components/PageHeader.vue";
 import BlogItem from "@/components/cards/BlogItem.vue";
 
+import makeRequest from "@/utils/requester";
+import constants from "@/utils/constants";
+
 export default {
-  components: { PageHeader, BlogItem,NavHeader },
+  components: { PageHeader, BlogItem, NavHeader },
   data() {
     return {
       posts: [],
+      pageNumber: 1,
+      pageSize: 12,
     };
   },
   methods: {
     async fetchPost() {
       try {
-        const response = await fetch("http://localhost:3000/posts");
-        const data = await response.json();
-        this.posts = data;
-        console.log(data)
+        const response = await makeRequest(
+          `${constants.ARTICLES_URL}?pageNumber=${this.pageNumber}&pageSize=${this.pageSize}`,
+          {
+            method: "get",
+          }
+        );
+
+        if (response.success) {
+          const data = response.data;
+          this.posts = data.rows;
+          console.log(data);
+        }
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     },
   },
 
-  async mounted() {
+  mounted() {
     this.fetchPost();
   },
 };
@@ -69,5 +82,8 @@ hr {
 
 .router-link {
   text-decoration: none;
+}
+.router-link :hover {
+  color: var(--muted, rgba(240, 215, 215, 0.6));
 }
 </style>

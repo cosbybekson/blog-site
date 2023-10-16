@@ -5,62 +5,34 @@
         <div class="navbar-brand d-flex">
           <h3 class="text-white"><router-link to="/">BlogPost</router-link></h3>
         </div>
-        <!-- <div class="d-flex">
-          <router-link to="/login">
-            <app-button
-              type="button"
-              class="btn btn-primary"
-              @click="toggleAuth"
-              v-if="loggedIn"
-            >
-              Login
-            </app-button>
-          </router-link>
-
-          <router-link to="/sign-up">
-            <app-button
-              type="button"
-              class="btn btn-primary"
-              @click="toggleAuth"
-              v-if="!loggedIn"
-            >
-              Sign Up
-            </app-button>
-          </router-link>
-        </div> -->
-
-        <!-- <div class="d-flex">
-          <router-link to="/login">
-            <app-button
-              type="button"
-              class="btn btn-primary"
-              @click="toggleAuth"
-            >
-              {{ loggedIn ? "Sign Up" : "Login" }}
-            </app-button>
-          </router-link>
-        </div> -->
 
         <div class="d-flex">
-          <router-link v-if="!loggedIn" to="/login">
-            <app-button
-              type="button"
-              class="btn btn-primary"
-              @click="toggleAuth"
-            >
-              Login
-            </app-button>
-          </router-link>
+          <div v-if="!isAuthenticated">
+            <router-link v-if="!isOnLoginRoute" to="/login">
+              <app-button
+                type="button"
+                class="btn btn-primary"
+                @click="onNavBtnClick"
+              >
+                Login
+              </app-button>
+            </router-link>
 
-          <router-link v-if="loggedIn" to="/sign-up">
-            <app-button
-              type="button"
-              class="btn btn-primary"
-              @click="toggleAuth"
-            >
-              Sign Up
-            </app-button>
-          </router-link>
+            <router-link v-if="isOnLoginRoute" to="/sign-up">
+              <app-button
+                type="button"
+                class="btn btn-primary"
+                @click="onNavBtnClick"
+              >
+                Sign Up
+              </app-button>
+            </router-link>
+          </div>
+          <div v-else>
+            <router-link to="/dashboard" class="btn btn-primary">
+              Go to Dashboard
+            </router-link>
+          </div>
         </div>
       </div>
     </nav>
@@ -68,18 +40,24 @@
 </template>
 
 <script>
+import sessionManager from "@/utils/session_manager";
+
 export default {
   computed: {
-    loggedIn() {
+    isOnLoginRoute() {
       if (this.$route.path.includes("login")) {
         return true;
       }
       return false;
     },
+
+    isAuthenticated() {
+      return sessionManager.isAuthenticated(); // You need to implement this function
+    },
   },
   methods: {
-    toggleAuth() {
-      if (!this.loggedIn) {
+    onNavBtnClick() {
+      if (!this.isOnLoginRoute) {
         // Redirect to Login page
         this.$router.push("/login");
       } else {

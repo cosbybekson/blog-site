@@ -10,32 +10,50 @@
         </ol>
         <div>
           <admin-card>
-            <form>
+            <Form @submit="postArticle">
               <div class="mb-3">
                 <label for="text" class="form-label">Title</label>
-                <input
-                  type="text"
+                <Field
                   class="form-control"
-                  aria-describedby="textHelp"
+                  id="title"
+                  name="title"
+                  v-model="formBody.title"
+                  :rules="validateTitle"
+                />
+                <ErrorMessage
+                  name="title"
+                  class="text-center justify-content-center d-flex text-danger"
                 />
               </div>
+
               <div class="mb-3">
                 <label for="text" class="form-label">Category</label>
-                <select class="form-control">
-                  <option selected>Choose..</option>
-                  <option value="1">One</option>
-                  <option value="2">Two</option>
-                  <option value="3">Three</option>
+                <select class="form-control" v-model="formBody.category">
+                  <option disabled value="">Choose..</option>
+                  <option
+                    v-for="category in categories"
+                    :value="category._id"
+                    :key="category._id"
+                    class="text-capitalize"
+                  >
+                    {{ category.name }}
+                  </option>
                 </select>
               </div>
+
               <div class="mb-3">
                 <label for="post-content" class="form-label">Content</label>
-                <textarea
+                <Editor
                   class="form-control"
-                  placeholder="write post here"
+                  placeholder="Write post here"
                   id="post-content"
-                  style="height: 100px"
-                ></textarea>
+                  style="height: 250px"
+                  v-model="formBody.content"
+                  api-key="4z0bmrrlmowod592cpwljxfp3nb0sjacfol0dkt8ehh45ntv"
+                  :init="{
+                    plugins: 'lists link table code wordcount',
+                  }"
+                />
               </div>
 
               <div class="mb-3">
@@ -53,19 +71,28 @@
               </div>
               <div class="mb-5">
                 <label for="text" class="form-label">Status</label>
-                <select class="form-control">
-                  <option selected>Public</option>
-                  <option value="1">Draft</option>
-                  <option value="2">Pending</option>
+                <select class="form-control" v-model="formBody.status">
+                  <option
+                    v-for="(option, index) in postStatuses"
+                    :value="option.value"
+                    :key="index"
+                  >
+                    {{ option.status }}
+                  </option>
                 </select>
               </div>
               <button
                 type="submit"
                 class="btn form-btn btn-lg text-white float-end"
+                :disabled="loading"
               >
-                Create Post
+                <span
+                  class="spinner-border spinner-border-sm spinner"
+                  v-if="loading"
+                ></span>
+                <span v-if="!loading"> Create Post </span>
               </button>
-            </form>
+            </Form>
           </admin-card>
         </div>
       </base-admin-page>
@@ -78,16 +105,60 @@ import AdminNav from "@/components/admin/AdminNav.vue";
 import BaseAdminPage from "@/components/admin/BaseAdminPage.vue";
 import AdminSidebar from "@/components/admin/AdminSidebar.vue";
 import AdminCard from "@/components/cards/AdminCard.vue";
+
+import makeRequest from "@/utils/requester";
+import constants from "@/utils/constants";
+import Validator from "@/utils/validator";
+import { Form, Field, ErrorMessage } from "vee-validate";
+// import strings from "@/utils/app_strings";
+
+import Editor from "@tinymce/tinymce-vue";
+
 export default {
-  components: { AdminNav, BaseAdminPage, AdminSidebar, AdminCard },
+  created() {
+    // Set the initial value after the component has been created
+    this.formBody.status = this.postStatuses[0].value;
+  },
+
+  mounted() {
+    this.getCategories();
+  },
+
   data() {
     return {
       selectedImg: null,
+      formBody: {
+        title: "",
+        category: "",
+        content: "",
+        image: "",
+        status: "",
+      },
+      postStatuses: [
+        { status: "Public", value: "public" },
+        { status: "Draft", value: "draft" },
+      ],
+      categories: [{}],
+      loading: false,
     };
   },
+
+  components: {
+    AdminNav,
+    BaseAdminPage,
+    AdminSidebar,
+    AdminCard,
+    Editor,
+    Form,
+    Field,
+    ErrorMessage,
+  },
+
   methods: {
     imageChange(event) {
       const file = event.target.files[0];
+      this.formBody.image = file;
+
       if (file && file.type.startsWith("image/")) {
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -95,6 +166,50 @@ export default {
         };
         reader.readAsDataURL(file);
       }
+    },
+
+    async postArticle() {
+      try {
+        const result = await makeRequest(constants.DASHBOARD_URL, {
+          method: "post",
+          data: {
+            title: this.formBody.title,
+            category: this.formBody.category,
+            content: this.formBody.content,
+            image: this.formBody.image,
+            status: this.formBody.status,
+          },
+        });
+        if (result.success) {
+          const data = result.data;
+          console.log(data);
+
+          window.location.reload();
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+
+    async getCategories() {
+      try {
+        const result = await makeRequest(
+          `${constants.CATEGORY_URL}?pageNumber=${this.pageNumber}&pageSize=${this.pageSize}`,
+          {
+            method: "get",
+          }
+        );
+
+        if (result.success) {
+          const data = result.data;
+          this.categories = data.rows;
+        }
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    validateTitle() {
+      return Validator.validateAlphaNumeric(this.formBody.title);
     },
   },
 };

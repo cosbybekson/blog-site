@@ -5,7 +5,7 @@
     </div>
     <div class="project-body">
       <h2 class="project-body-title mt-4">{{ title }}</h2>
-      <p class="project-body-content mt-2">{{ content }}</p>
+      <div class="project-body-content mt-2" v-html="content"></div>
     </div>
   </div>
 </template>
@@ -13,10 +13,18 @@
 <script>
 import { toInternetImage } from "@/utils/function";
 export default {
+  data() {
+    return {
+      loading: false,
+    };
+  },
   props: {
     imageSrc: String,
     title: String,
-    content: String,
+    content: {
+      type: String,
+      required: true,
+    },
   },
   methods: {
     toImageRes() {
