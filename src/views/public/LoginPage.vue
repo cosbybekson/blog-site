@@ -42,8 +42,11 @@
           </div>
           <div class="d-grid gap-2 mt-4 form-btn">
             <button type="submit" :disabled="loading" class="btn text-white">
-              <span v-if="!loading">Login</span>
-              <circular-progress v-if="loading" />
+              <span
+                      class="spinner-border spinner-border-sm spinner"
+                      v-if="loading"
+                    ></span>
+                    <span v-if="!loading">Login</span>
             </button>
           </div>
         </Form>
@@ -62,12 +65,13 @@ import NavHeader from "@/components/NavHeader.vue";
 import BaseCard from "@/components/cards/BaseCard.vue";
 import FooterPage from "@/components/FooterPage.vue";
 import ErrorCard from "@/components/ErrorCard.vue";
-import CircularProgress from "@/components/buttons/CircularProgress.vue";
+// import CircularProgress from "@/components/buttons/CircularProgress.vue";
 
 import makeRequest from "@/utils/requester";
 import constants from "@/utils/constants";
 import sessionManager from "@/utils/session_manager";
 import Validator from "@/utils/validator";
+import userStorage from "@/utils/user_storage";
 
 import { Form, Field, ErrorMessage } from "vee-validate";
 
@@ -80,7 +84,6 @@ export default {
     Field,
     ErrorMessage,
     ErrorCard,
-    CircularProgress,
   },
   data() {
     return {
@@ -89,7 +92,8 @@ export default {
       error: null,
       loading: false,
     };
-  },
+  },// import AdminCard from "@/components/cards/AdminCard.vue";
+// import AppButton from "@/components/buttons/AppButton.vue";
   methods: {
     async login() {
       try {
@@ -102,20 +106,17 @@ export default {
           },
         });
 
-        console.log(result);
         this.stopLoading();
-
         if (result.success) {
-          console.log(result);
           const dataResponse = result.data;
           sessionManager.saveToken(dataResponse.accessToken);
-          // this.$router.push({ name: "/" });
+          userStorage.saveUser(dataResponse.user);
+          this.$router.push("/dashboard");
         } else {
           this.error = result.message;
         }
       } catch (error) {
         this.error = "Something went wrong!";
-        console.error(error);
       }
     },
     validateUsername() {
