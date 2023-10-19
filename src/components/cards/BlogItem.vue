@@ -1,7 +1,7 @@
 <template>
   <div class="mb-5 mt-5">
     <div class="project-img">
-      <img class="img-fluid" :src="toInternetImage()" alt="" />
+      <img class="img-fluid" :src="toInternetImage()" alt="" style="width: 100%;"/>
     </div>
     <div class="project-body">
       <h2 class="project-body-title mt-4">{{ title }}</h2>

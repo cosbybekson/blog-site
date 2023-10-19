@@ -5,4 +5,5 @@ export default {
   CATEGORY_URL: "categories",
   DASHBOARD_URL: "dashboard",
   ARTICLES_URL: "articles",
+  BASE_IMAGE_URL: "https://anomaba-blog-server.onrender.com/uploads",
 };

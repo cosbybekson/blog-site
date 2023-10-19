@@ -6,13 +6,15 @@
         <circular-progress />
       </div>
       <div v-else-if="!loading">
-        <page-header :badge="post.category" :title="post.title" />
+        <page-header :badge="post.category.name" :title="post.title" />
 
         <div class="container">
-          <p class="blog-item-title text-center text-white mb-5 mt-5">
-            {{ formattedCreatedAt(post.createdAt) }} - {{ post.user }}
+          <p
+            class="blog-item-title text-uppercase text-center text-white mb-5 mt-5"
+          >
+            {{ formattedCreatedAt(post.createdAt) }} - {{ post.user.username }}
           </p>
-          <blog-item :imageSrc="post.imgUrl" :content="post.content" />
+          <blog-item :imageSrc="post.imageUrl" :content="post.content" />
         </div>
         <div class="container">
           <h2 class="recommendation text-start">
@@ -132,7 +134,14 @@ export default {
   data() {
     return {
       loading: false,
-      post: {},
+      post: {
+        category: {
+          name: "",
+        },
+        user: {
+          username: "",
+        },
+      },
       comments: [],
     };
   },
@@ -149,8 +158,6 @@ export default {
         if (response.success) {
           const data = response.data;
           this.post = data;
-          // this.comments = data.comments;
-          console.log(data);
         }
       } catch (error) {
         console.error("Error fetching data:", error);
@@ -163,7 +170,6 @@ export default {
   mounted() {
     const postId = this.$route.params.postId;
     this.fetchPostById(postId);
-    console.log(this.$route.name);
   },
 };
 </script>

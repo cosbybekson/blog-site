@@ -28,7 +28,14 @@
 
               <div class="mb-3">
                 <label for="text" class="form-label">Category</label>
-                <select class="form-control" v-model="formBody.category">
+                <select
+                  class="form-control"
+                  v-model="formBody.category"
+                  v-validate="required"
+                  name="category"
+                  id="category"
+                  
+                >
                   <option disabled value="">Choose..</option>
                   <option
                     v-for="category in categories"
@@ -39,6 +46,10 @@
                     {{ category.name }}
                   </option>
                 </select>
+                <ErrorMessage
+                  name="category"
+                  class="text-center justify-content-center d-flex text-danger"
+                />
               </div>
 
               <div class="mb-3">
@@ -113,6 +124,7 @@ import { Form, Field, ErrorMessage } from "vee-validate";
 // import strings from "@/utils/app_strings";
 
 import Editor from "@tinymce/tinymce-vue";
+// import { isEmpty } from "@/utils/function";
 
 export default {
   created() {
@@ -170,16 +182,28 @@ export default {
 
     async postArticle() {
       try {
+        this.loading = true;
+
+        const formData = new FormData();
+        formData.append("image", this.formBody.image);
+        formData.append("title", this.formBody.title);
+        formData.append("content", this.formBody.content);
+        formData.append("category", this.formBody.category);
+        formData.append("status", this.formBody.status);
+
         const result = await makeRequest(constants.DASHBOARD_URL, {
           method: "post",
-          data: {
-            title: this.formBody.title,
-            category: this.formBody.category,
-            content: this.formBody.content,
-            image: this.formBody.image,
-            status: this.formBody.status,
-          },
+          data: formData,
+          // data: {
+          //   title: this.formBody.title,
+          //   category: this.formBody.category,
+          //   content: this.formBody.content,
+          //   image: this.formBody.image,
+          //   status: this.formBody.status,
+          // },
         });
+
+        this.loading = false;
         if (result.success) {
           const data = result.data;
           console.log(data);
@@ -209,7 +233,10 @@ export default {
       }
     },
     validateTitle() {
-      return Validator.validateAlphaNumeric(this.formBody.title);
+      return Validator.required(this.formBody.title);
+    },
+    validateCategory() {
+      return Validator.isEmpty(this.formBody.category);
     },
   },
 };
