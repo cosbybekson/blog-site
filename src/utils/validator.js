@@ -30,6 +30,19 @@ export default class Validator {
     return true;
   }
 
+  static required(value) {
+    if (!value) {
+      return "This field is required";
+    }
+
+    if (value.length < 3) {
+      return "This field must be at least 3 characters.";
+    }
+
+    // If both conditions pass, the value is valid
+    return true;
+  }
+
   static validatePassword(value) {
     if (!value) {
       return "This field is required";
@@ -40,6 +53,18 @@ export default class Validator {
     }
 
     // If both conditions pass, the value is valid
+    return true;
+  }
+
+  static isEmpty(value) {
+    if (!value) {
+      return "This field is required";
+    }
+
+    if (value.length === 0) {
+      return "This field must be selected.";
+    }
+
     return true;
   }
 }

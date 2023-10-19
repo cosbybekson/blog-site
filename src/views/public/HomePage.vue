@@ -12,7 +12,7 @@
         >
           <router-link :to="`/blogs/${post._id}`" class="router-link">
             <blog-item
-              :imageSrc="post.imgUrl"
+              :imageSrc="post.imageUrl"
               :title="post.title"
               :content="post.shortDes"
             />

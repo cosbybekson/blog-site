@@ -1,9 +1,11 @@
+import constants from "./constants";
+
 export function imageRes(imageName) {
   return `@/assets/${imageName}`;
 }
 
 export function toInternetImage(imageUrl) {
-  return `https://juliusmortsi.com/uploads/${imageUrl}`;
+  return `${constants.BASE_IMAGE_URL}/${imageUrl}`;
 }
 
 export function isEmpty(value) {
