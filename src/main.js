@@ -19,6 +19,7 @@ import AdminPost from "./views/admin/AdminPost.vue";
 import AdminSettings from "./views/admin/AdminSettings.vue";
 import AdminNewPost from "./views/admin/AdminNewPost.vue";
 import AdminCategory from "./views/admin/AdminCategory.vue";
+import EditPost from "./components/cards/EditPost.vue"
 import store from "./utils/store";
 import sessionManager from "@/utils/session_manager";
 
@@ -47,6 +48,7 @@ const router = createRouter({
     { path: "/dashboard/settings", component: AdminSettings },
     { path: "/dashboard/new-post", component: AdminNewPost },
     { path: "/dashboard/category", component: AdminCategory },
+    {path: "/dashboard/edit-post", component: EditPost}
   ],
 });
 

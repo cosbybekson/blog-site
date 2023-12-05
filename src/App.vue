@@ -1,16 +1,12 @@
 <template>
-  <!-- <nav-header /> -->
   <router-view />
-  <!-- <footer-page /> -->
 </template>
 
 <script>
-// import HomePage from "./views/HomePage.vue";
-// import NavHeader from "./components/NavHeader.vue";
-// import FooterPage from "./components/FooterPage.vue";
+
 export default {
   name: "App",
-  // components: { NavHeader, FooterPage },
+
 };
 </script>
 

@@ -1,27 +1,37 @@
 <template>
   <div>
     <nav-header />
-    <page-header badge="Blog" title="Get precise knowledge wherever you are" />
-    <div class="container">
-      <hr />
-      <div class="row blog-content-pd">
-        <div
-          v-for="post in posts"
-          :key="post._id"
-          class="col-lg-4 col-md-6 col-sm-12"
-        >
-          <router-link :to="`/blogs/${post._id}`" class="router-link">
-            <blog-item
-              :imageSrc="post.imageUrl"
-              :title="post.title"
-              :content="post.shortDes"
-            />
-          </router-link>
-        </div>
-        <div class="mt-1 d-flex justify-content-center">
-          <app-button type="button" class="btn btn-primary"
-            >Load more</app-button
-          >
+    <div>
+      <div v-if="loading">
+        <circular-progress />
+      </div>
+      <div v-else-if="!loading">
+        <page-header
+          badge="Blog"
+          title="Get precise knowledge wherever you are"
+        />
+        <div class="container">
+          <hr />
+          <div class="row blog-content-pd">
+            <div
+              v-for="post in posts"
+              :key="post._id"
+              class="col-lg-4 col-md-6 col-sm-12"
+            >
+              <router-link :to="`/blogs/${post._id}`" class="router-link">
+                <blog-item
+                  :imageSrc="post.imageUrl"
+                  :title="post.title"
+                  :content="post.shortDes"
+                />
+              </router-link>
+            </div>
+            <div class="mt-1 d-flex justify-content-center">
+              <app-button type="button" class="btn btn-primary"
+                >Load more</app-button
+              >
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -32,21 +42,25 @@
 import NavHeader from "@/components/NavHeader.vue";
 import PageHeader from "@/components/PageHeader.vue";
 import BlogItem from "@/components/cards/BlogItem.vue";
+import CircularProgress from "@/components/buttons/CircularProgress.vue";
 
 import makeRequest from "@/utils/requester";
 import constants from "@/utils/constants";
 
 export default {
-  components: { PageHeader, BlogItem, NavHeader },
+  components: { PageHeader, BlogItem, NavHeader, CircularProgress },
   data() {
     return {
       posts: [],
       pageNumber: 1,
       pageSize: 12,
+      loading: false,
     };
   },
   methods: {
     async fetchPost() {
+      this.loading = true;
+
       try {
         const response = await makeRequest(
           `${constants.ARTICLES_URL}?pageNumber=${this.pageNumber}&pageSize=${this.pageSize}`,
@@ -54,7 +68,7 @@ export default {
             method: "get",
           }
         );
-
+        this.loading = false;
         if (response.success) {
           const data = response.data;
           this.posts = data.rows;

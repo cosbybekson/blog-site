@@ -147,6 +147,7 @@ export default {
   },
   methods: {
     async fetchPostById(postId) {
+      this.loading = true;
       try {
         const response = await makeRequest(
           `${constants.ARTICLES_URL}/${postId}`,
@@ -154,7 +155,7 @@ export default {
             method: "get",
           }
         );
-
+        this.loading = false;
         if (response.success) {
           const data = response.data;
           this.post = data;

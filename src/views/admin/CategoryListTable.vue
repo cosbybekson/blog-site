@@ -6,7 +6,7 @@
       </div>
       <div class="card-body">
         <div v-if="loading">
-          <circular-progress />
+          <app-spinner />
         </div>
         <div v-else-if="isCategoriesEmpty && !loading" class="empty-state">
           <p>No categories available. Add a category.</p>
@@ -71,10 +71,10 @@ import makeRequest from "@/utils/requester";
 import constants from "@/utils/constants";
 import strings from "@/utils/app_strings";
 
-import CircularProgress from "@/components/buttons/CircularProgress.vue";
+import AppSpinner from "@/components/buttons/AppSpinner.vue";
 
 export default {
-  components: { CircularProgress },
+  components: { AppSpinner },
 
   mounted() {
     this.getCategories();
@@ -91,9 +91,9 @@ export default {
   },
   methods: {
     async getCategories() {
-      try {
-        this.startLoading();
+      this.startLoading();
 
+      try {
         const result = await makeRequest(
           `${constants.CATEGORY_URL}?pageNumber=${this.pageNumber}&pageSize=${this.pageSize}`,
           {
@@ -171,7 +171,7 @@ export default {
     },
 
     async nextPage() {
-      this.pageNumber+=1;
+      this.pageNumber += 1;
       await this.getCategories();
     },
   },
